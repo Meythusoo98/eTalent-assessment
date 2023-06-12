@@ -1,6 +1,7 @@
 package com.enviro.assessment.grad001.mmathusokgalane.controller;
 import com.enviro.assessment.grad001.mmathusokgalane.repository.AccountProfile;
 import com.enviro.assessment.grad001.mmathusokgalane.repository.AccountProfileRepository;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ public class ImageController {
     }
     @GetMapping(value = "/{name}/{surname}/{\\w\\.\\w}")
     public ResponseEntity<Resource> getHttpImageLink(@PathVariable String name, @PathVariable String surname, @PathVariable String fileName){
-        AccountProfile accountProfile = accountProfileRepository.finalize(name, surname);
+        AccountProfile accountProfile = accountProfileRepository.findByNameAndSurname(name, surname);
 
         if (accountProfile == null) {
             return ResponseEntity.notFound().build();
@@ -32,19 +33,15 @@ public class ImageController {
             return ResponseEntity.notFound().build();
         }
 
-        try {
-            Path imagePath = Paths.get("./images/" + fileName);
-            Resource imageResource = new UrlResource(imagePath.toUri());
+        Path imagePath = Paths.get("./images/" + fileName);
+        Resource imageResource = new FileSystemResource(imagePath.toFile());
 
-            if (imageResource.exists()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .body(imageResource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error retrieving image", e);
+        if (imageResource.exists()) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(imageResource);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 }
