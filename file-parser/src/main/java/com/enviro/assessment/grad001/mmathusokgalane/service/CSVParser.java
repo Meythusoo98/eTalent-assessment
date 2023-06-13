@@ -18,25 +18,32 @@ public class CSVParser implements FileParser {
     @Override
     public void parseCSV(File csvFile) {
         String fileName = "./resources/1672815113084-GraduateDev_AssessmentCsv_Ref003.csv";
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] values = line.split(",");
-                if (values.length >= 4) {
-                    String name = values[0];
-                    String surname = values[1];
-                    String base64ImageData = values[2];
-                    String notes = values[3];
-                    File imageFile = convertCSVDataToImage(base64ImageData);
-                    URI imageLink = createImageLink(imageFile);
-                    AccountProfile accountProfile = new AccountProfile(name, surname, imageLink.toString(), notes);
-                    storeAccountProfile(accountProfile);
-                }
+        try {
+            // Read the file contents
+            String fileContent = new String(Files.readAllBytes(csvFile.toPath()));
+
+            // Split the file content into lines
+            String[] lines = fileContent.split("\n");
+
+            for (String line : lines) {
+                // Split each line by comma
+                String[] fields = line.split(",");
+
+                // Extract the fields from the line
+                String name = fields[0].trim();
+                String surname = fields[1].trim();
+                String base64Image = fields[2].trim();
+                String notes = fields[3].trim();
+
+                // Convert base64 image data to physical file
+                File imageFile = convertCSVDataToImage(base64Image);
+
+                // Create AccountProfile object and store in the database
+                AccountProfile accountProfile = new AccountProfile(name, surname, imageFile.getName(), notes);
+                storeAccountProfile(accountProfile);
             }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("CSV file not found", e);
         } catch (IOException e) {
-            throw new RuntimeException("Error reading CSV file", e);
+            throw new RuntimeException("Error parsing file", e);
         }
     }
 
