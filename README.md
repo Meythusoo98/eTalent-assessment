@@ -1,7 +1,6 @@
 # eTalent-assessment
-The project I am joining a data centre division for Enviro-Bank
-So I had to implement a basic solution of a file parser to convert the contents of the file and
-store the records into a database.
+The project I am exposing the endpoints to a waste collection data.
+So I had to implement a basic solution that is able to expose the REST ENDPOINTS.
 I had to do an in-memory H2 database.
 Using Rest controller to get my endpoints
 Springboot and maven application
